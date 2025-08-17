@@ -19,16 +19,17 @@ class _SplashScreenState extends State<SplashScreen> {
 	@override
 	void initState() {
 		super.initState();
-		_timer = Timer(const Duration(milliseconds: 1200), _goNext);
+		WidgetsBinding.instance.addPostFrameCallback((_) {
+			_timer = Timer(const Duration(milliseconds: 1200), _goNext);
+		});
 	}
 
 	void _goNext() {
+		if (!mounted) return;
 		final userProvider = context.read<UserProvider>();
-		if (userProvider.isAuthenticated) {
-			Navigator.of(context).pushReplacementNamed(AppRoutes.home);
-		} else {
-			Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
-		}
+		final String targetRoute = userProvider.isAuthenticated ? AppRoutes.home : AppRoutes.onboarding;
+		if (!mounted) return;
+		Navigator.of(context).pushNamedAndRemoveUntil(targetRoute, (_) => false);
 	}
 
 	@override
